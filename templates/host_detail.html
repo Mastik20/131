@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-4">Хост: {{ host }}</h1>
+<div class="row">
+  <div class="col-lg-12">
+    <canvas id="metricsChart" height="120"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const host = {{ host | tojson }};
+  const chartElement = document.getElementById('metricsChart');
+  const chart = new Chart(chartElement, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        { label: 'CPU %', data: [], borderColor: '#0d6efd', fill: false },
+        { label: 'Memory %', data: [], borderColor: '#198754', fill: false },
+        { label: 'Disk %', data: [], borderColor: '#dc3545', fill: false },
+      ]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: { beginAtZero: true, max: 100 }
+      }
+    }
+  });
+
+  async function refreshMetrics() {
+    const response = await fetch(`/api/v1/metrics/${host}?limit=50`);
+    const data = await response.json();
+    const labels = data.metrics.map(entry => new Date(entry.timestamp * 1000).toLocaleTimeString());
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = data.metrics.map(entry => entry.cpu);
+    chart.data.datasets[1].data = data.metrics.map(entry => entry.memory);
+    chart.data.datasets[2].data = data.metrics.map(entry => entry.disk);
+    chart.update();
+  }
+
+  refreshMetrics();
+  setInterval(refreshMetrics, 5000);
+</script>
+{% endblock %}

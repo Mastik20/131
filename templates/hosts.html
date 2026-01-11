@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h1 class="mb-4">Моніторені хости</h1>
+{% if hosts %}
+  <div class="list-group">
+    {% for host in hosts %}
+      <a class="list-group-item list-group-item-action" href="{{ url_for('host_detail', host=host) }}">
+        {{ host }}
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-muted">Поки немає зареєстрованих агентів.</p>
+{% endif %}
+{% endblock %}

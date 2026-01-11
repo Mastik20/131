@@ -1,0 +1,8 @@
+{
+  "token": "change-me",
+  "thresholds": {
+    "cpu": 85,
+    "memory": 85,
+    "disk": 90
+  }
+}
